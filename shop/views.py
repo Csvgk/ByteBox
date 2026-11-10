@@ -2,6 +2,8 @@ from django.core.paginator import Paginator
 from django.db.models import F, Q
 from django.shortcuts import get_object_or_404, render
 
+from blog.models import Post
+
 from .models import Brand, Category, Product
 
 SORT_OPTIONS = {
@@ -19,6 +21,7 @@ def home(request):
         # Знижки: є стара ціна і вона більша за нову
         'sale_products': products.filter(old_price__gt=F('price'))[:4],
         'new_products': products[:8],
+        'latest_posts': Post.published.select_related('category')[:3],
     }
     return render(request, 'shop/home.html', context)
 

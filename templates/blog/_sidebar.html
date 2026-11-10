@@ -1,0 +1,28 @@
+<aside class="d-flex flex-column gap-3">
+    <form class="panel" action="{% url 'blog:post_list' %}" method="get" role="search">
+        <h6 class="fw-bold">Пошук у блозі</h6>
+        <div class="input-group">
+            <input type="search" name="q" class="form-control" placeholder="Наприклад, DDR5" value="{{ query }}">
+            <button class="btn btn-accent" type="submit" aria-label="Шукати"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+    <div class="panel">
+        <h6 class="fw-bold">Рубрики</h6>
+        <ul class="list-unstyled mb-0">
+            {% for cat in blog_categories %}
+            <li class="d-flex justify-content-between py-1">
+                <a href="{% url 'blog:post_list' %}?category={{ cat.slug }}">{{ cat.name }}</a>
+                <span class="text-secondary">{{ cat.num_posts }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="panel">
+        <h6 class="fw-bold">Теги</h6>
+        <div class="d-flex flex-wrap gap-2">
+            {% for t in blog_tags %}
+            <a class="tag-chip" href="{% url 'blog:post_list' %}?tag={{ t.slug }}">#{{ t.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</aside>

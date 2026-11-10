@@ -347,3 +347,53 @@ a { color: var(--bb-accent); }
     background: linear-gradient(135deg, var(--bb-accent), var(--bb-accent-2));
     border-radius: 50%;
 }
+
+/* ---------- Блог ---------- */
+.post-card {
+    overflow: hidden;
+    border: 1px solid var(--bb-line);
+    border-radius: 16px;
+}
+
+.post-cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
+.article-cover {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.article-body {
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.tag-chip {
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    color: var(--bb-accent);
+    text-decoration: none;
+    background: #eef3ff;
+    border-radius: 20px;
+}
+
+.tag-chip:hover { background: #dce6ff; }
+
+.comment {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--bb-line);
+}
+
+.avatar-sm {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+}

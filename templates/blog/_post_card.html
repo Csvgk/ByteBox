@@ -1,0 +1,9 @@
+<article class="card post-card h-100">
+    <a href="{{ post.get_absolute_url }}"><img src="{{ post.image_url }}" class="post-cover" alt="{{ post.title }}" loading="lazy"></a>
+    <div class="card-body d-flex flex-column">
+        <p class="product-meta mb-1">{{ post.category.name }} · {{ post.created_at|date:"d.m.Y" }}</p>
+        <h3 class="h5 fw-bold"><a class="text-reset text-decoration-none" href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+        <p class="text-secondary">{{ post.excerpt }}</p>
+        <a class="link-accent mt-auto" href="{{ post.get_absolute_url }}">Читати далі →</a>
+    </div>
+</article>

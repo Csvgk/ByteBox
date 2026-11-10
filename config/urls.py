@@ -9,6 +9,7 @@ admin.site.site_title = 'ByteBox'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
+    path('blog/', include('blog.urls')),
     path('', include('shop.urls')),
 ]
 

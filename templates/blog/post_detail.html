@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'blog:post_list' %}">Блог</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'blog:post_list' %}?category={{ post.category.slug }}">{{ post.category.name }}</a></li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <article class="col-12 col-lg-8">
+            <h1 class="page-title">{{ post.title }}</h1>
+            <p class="text-secondary">
+                <i class="bi bi-person"></i> {{ post.author.get_full_name|default:post.author.username }}
+                · <i class="bi bi-calendar"></i> {{ post.created_at|date:"d.m.Y" }}
+                {% if perms.blog.change_post %}· <a href="{% url 'blog:post_update' post.slug %}"><i class="bi bi-pencil"></i> Редагувати</a>{% endif %}
+            </p>
+            <img src="{{ post.image_url }}" class="article-cover mb-4" alt="{{ post.title }}">
+            <p class="lead">{{ post.excerpt }}</p>
+            <div class="article-body">{{ post.content|linebreaks }}</div>
+
+            <div class="d-flex flex-wrap gap-2 my-4">
+                {% for t in post.tags.all %}
+                <a class="tag-chip" href="{% url 'blog:post_list' %}?tag={{ t.slug }}">#{{ t.name }}</a>
+                {% endfor %}
+            </div>
+
+            <section id="comments" class="panel">
+                <h2 class="h5 fw-bold">Коментарі ({{ comments|length }})</h2>
+                {% for comment in comments %}
+                <div class="comment">
+                    <div class="avatar avatar-sm">{{ comment.author.username|first|upper }}</div>
+                    <div>
+                        <strong>{{ comment.author.first_name|default:comment.author.username }}</strong>
+                        <span class="text-secondary small">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                        <p class="mb-0">{{ comment.text|linebreaksbr }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-secondary">Коментарів поки немає — будьте першим!</p>
+                {% endfor %}
+
+                {% if user.is_authenticated %}
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+                    {{ form.text }}
+                    {% for error in form.text.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                    <button class="btn btn-accent mt-2" type="submit">Надіслати</button>
+                </form>
+                {% else %}
+                <p class="mb-0 mt-3"><a href="{% url 'accounts:login' %}?next={{ request.path }}">Увійдіть</a>, щоб залишити коментар.</p>
+                {% endif %}
+            </section>
+        </article>
+        <div class="col-12 col-lg-4">
+            {% include 'blog/_sidebar.html' %}
+            {% if more_posts %}
+            <div class="panel mt-3">
+                <h6 class="fw-bold">Ще почитати</h6>
+                {% for p in more_posts %}
+                <a class="d-block py-1" href="{{ p.get_absolute_url }}">{{ p.title }}</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

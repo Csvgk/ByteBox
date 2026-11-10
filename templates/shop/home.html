@@ -60,4 +60,18 @@
         {% endfor %}
     </div>
 </section>
+
+{% if latest_posts %}
+<section class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="section-title mb-0">Зі світу комп'ютерів</h2>
+        <a href="{% url 'blog:post_list' %}" class="link-accent">Усі статті →</a>
+    </div>
+    <div class="row g-4">
+        {% for post in latest_posts %}
+        <div class="col-12 col-md-4">{% include 'blog/_post_card.html' %}</div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            <div class="panel">
+                <h1 class="page-title mb-4">{{ title }}</h1>
+                <!-- enctype потрібен, щоб форма могла передати файл (обкладинку) -->
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% include 'includes/form_fields.html' %}
+                    <button class="btn btn-accent" type="submit">Зберегти</button>
+                    <a class="btn btn-link" href="{% if post %}{{ post.get_absolute_url }}{% else %}{% url 'blog:post_list' %}{% endif %}">Скасувати</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
