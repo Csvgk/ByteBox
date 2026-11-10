@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}{{ build.name }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            {% if build.is_prebuilt %}
+            <li class="breadcrumb-item"><a href="{% url 'builder:build_list' %}">Готові ПК</a></li>
+            {% else %}
+            <li class="breadcrumb-item"><a href="{% url 'accounts:profile' %}">Мої збірки</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active">{{ build.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <span class="badge purpose-badge mb-2">{{ build.get_purpose_display }}</span>
+            <h1 class="page-title">{{ build.name }}</h1>
+            {% if build.description %}<p class="lead">{{ build.description }}</p>{% endif %}
+
+            <div class="panel p-0">
+                {% for slot, label, product in build.components %}
+                <div class="slot-row">
+                    <div class="slot-label">{{ label }}</div>
+                    {% if product %}
+                    <img src="{{ product.image_url }}" alt="">
+                    <div class="flex-grow-1">
+                        <a class="fw-bold text-reset text-decoration-none" href="{{ product.get_absolute_url }}">{{ product.brand.name }} {{ product.name }}</a>
+                        {% if not product.in_stock %}<div class="stock out small">Немає в наявності</div>{% endif %}
+                    </div>
+                    <div class="fw-bold text-nowrap">{{ product.price|floatformat:0|intcomma }} ₴</div>
+                    {% else %}
+                    <div class="text-secondary flex-grow-1">— не обрано —</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="panel summary-sticky">
+                <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Споживання</span><span>~{{ build.power_draw }} Вт</span></div>
+                <div class="d-flex justify-content-between fs-3 fw-bold mb-3"><span>Разом</span><span>{{ build.total_price|floatformat:0|intcomma }} ₴</span></div>
+
+                <form method="post" action="{% url 'builder:build_add_to_cart' build.slug %}">
+                    {% csrf_token %}
+                    <button class="btn btn-accent btn-lg w-100" type="submit"><i class="bi bi-cart-plus"></i> Купити всю збірку</button>
+                </form>
+                <form method="post" action="{% url 'builder:configurator_load' build.slug %}" class="mt-2">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-sliders"></i> Змінити в конфігураторі</button>
+                </form>
+                {% if build.user == user %}
+                <form method="post" action="{% url 'builder:build_delete' build.slug %}" class="mt-2" onsubmit="return confirm('Видалити збірку?')">
+                    {% csrf_token %}
+                    <button class="btn btn-link text-danger w-100" type="submit">Видалити збірку</button>
+                </form>
+                {% endif %}
+
+                <h2 class="h6 fw-bold mt-4">Перевірка сумісності</h2>
+                {% include 'builder/_report.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

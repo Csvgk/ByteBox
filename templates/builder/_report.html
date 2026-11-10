@@ -1,0 +1,9 @@
+{# Результат перевірки сумісності: список повідомлень з іконками #}
+<ul class="list-unstyled report mb-0">
+    {% for level, text in report %}
+    <li class="report-{{ level }}">
+        {% if level == 'error' %}<i class="bi bi-x-octagon-fill"></i>{% elif level == 'warning' %}<i class="bi bi-exclamation-triangle-fill"></i>{% else %}<i class="bi bi-check-circle-fill"></i>{% endif %}
+        {{ text }}
+    </li>
+    {% endfor %}
+</ul>

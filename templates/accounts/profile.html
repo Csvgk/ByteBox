@@ -39,6 +39,20 @@
                 <p class="text-secondary mb-0">Замовлень поки немає. <a href="{% url 'shop:catalog' %}">Перейти до каталогу</a></p>
                 {% endif %}
             </div>
+            <div class="panel mt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="h5 fw-bold mb-0">Мої збірки</h2>
+                    <a href="{% url 'builder:configurator' %}" class="link-accent">+ Нова збірка</a>
+                </div>
+                {% for build in builds %}
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <a href="{{ build.get_absolute_url }}">{{ build.name }}</a>
+                    <span class="text-secondary">{{ build.total_price|floatformat:0|intcomma }} ₴</span>
+                </div>
+                {% empty %}
+                <p class="text-secondary mb-0 mt-2">Збережених збірок немає. Зберіть ПК у конфігураторі і натисніть «Зберегти».</p>
+                {% endfor %}
+            </div>
             {% endblock %}
         </div>
     </div>

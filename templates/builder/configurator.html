@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Конфігуратор ПК{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <span class="eyebrow text-primary">Зібрати самому</span>
+    <h1 class="page-title">Конфігуратор ПК</h1>
+    <p class="text-secondary">Обирайте деталі по черзі — ми покажемо лише сумісні варіанти і перевіримо збірку.</p>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <div class="panel p-0">
+                {% for slot, label, product in build.components %}
+                <div class="slot-row">
+                    <div class="slot-label">{{ label }}</div>
+                    {% if product %}
+                    <img src="{{ product.image_url }}" alt="">
+                    <div class="flex-grow-1">
+                        <a class="fw-bold text-reset text-decoration-none" href="{{ product.get_absolute_url }}">{{ product.brand.name }} {{ product.name }}</a>
+                        <div class="small text-secondary">{{ product.price|floatformat:0|intcomma }} ₴</div>
+                    </div>
+                    <a class="btn btn-sm btn-light" href="{% url 'builder:configurator_choose' slot %}">Змінити</a>
+                    <form method="post" action="{% url 'builder:configurator_remove' slot %}">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-link text-danger" type="submit" title="Прибрати" aria-label="Прибрати"><i class="bi bi-x-lg"></i></button>
+                    </form>
+                    {% else %}
+                    <div class="flex-grow-1 text-secondary">Не обрано</div>
+                    <a class="btn btn-sm btn-accent" href="{% url 'builder:configurator_choose' slot %}"><i class="bi bi-plus-lg"></i> Обрати</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="panel summary-sticky">
+                <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Споживання</span><span>~{{ build.power_draw }} Вт</span></div>
+                {% if recommended_psu %}
+                <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Рекомендований БЖ</span><span>від {{ recommended_psu }} Вт</span></div>
+                {% endif %}
+                <div class="d-flex justify-content-between fs-3 fw-bold mb-3"><span>Разом</span><span>{{ build.total_price|floatformat:0|intcomma }} ₴</span></div>
+
+                {% if report %}
+                <h2 class="h6 fw-bold">Перевірка сумісності</h2>
+                {% include 'builder/_report.html' %}
+                {% else %}
+                <p class="text-secondary">Почніть з процесора — від нього залежить вибір плати і пам'яті.</p>
+                {% endif %}
+
+                {% if build.products %}
+                <hr>
+                <form method="post" action="{% url 'builder:configurator_to_cart' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-accent btn-lg w-100" type="submit" {% if has_errors %}disabled{% endif %}>
+                        <i class="bi bi-cart-plus"></i> Додати збірку в кошик
+                    </button>
+                </form>
+                {% if has_errors %}<p class="small text-danger mt-1 mb-0">Виправте помилки сумісності, щоб купити збірку.</p>{% endif %}
+
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'builder:configurator_save' %}" class="input-group mt-3">
+                    {% csrf_token %}
+                    <input type="text" name="name" class="form-control" placeholder="Назва збірки" maxlength="120" aria-label="Назва збірки">
+                    <button class="btn btn-outline-primary" type="submit">Зберегти</button>
+                </form>
+                {% else %}
+                <p class="small mt-3 mb-0"><a href="{% url 'accounts:login' %}?next={{ request.path }}">Увійдіть</a>, щоб зберегти збірку в профілі.</p>
+                {% endif %}
+
+                <form method="post" action="{% url 'builder:configurator_reset' %}" class="mt-2">
+                    {% csrf_token %}
+                    <button class="btn btn-link text-secondary w-100" type="submit">Почати спочатку</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

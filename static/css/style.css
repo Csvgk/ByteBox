@@ -436,3 +436,82 @@ a { color: var(--bb-accent); }
 .status-shipped { color: #b45309; background: #fef3c7; }
 .status-done { color: #15803d; background: #dcfce7; }
 .status-cancelled { color: #b91c1c; background: #fee2e2; }
+
+/* ---------- Збірки і конфігуратор ---------- */
+.build-card {
+    border: 1px solid var(--bb-line);
+    border-radius: 16px;
+}
+
+.purpose-badge {
+    align-self: flex-start;
+    color: var(--bb-accent-2);
+    background: #efeaff;
+}
+
+.build-specs li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    font-size: 0.9rem;
+    text-align: right;
+    border-bottom: 1px dashed var(--bb-line);
+}
+
+.build-specs li span {
+    color: var(--bb-muted);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.slot-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--bb-line);
+}
+
+.slot-row:last-child { border-bottom: 0; }
+
+.slot-row img {
+    width: 64px;
+    border-radius: 8px;
+}
+
+.slot-label {
+    width: 150px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--bb-muted);
+}
+
+/* Підсумок «прилипає» збоку лише на широких екранах */
+@media (min-width: 992px) {
+    .summary-sticky {
+        position: sticky;
+        top: 90px;
+    }
+}
+
+.slot-row .flex-grow-1 {
+    flex: 1 1 180px;
+    min-width: 0;
+}
+
+.report li {
+    display: flex;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 0.9rem;
+}
+
+.report-error { color: var(--bb-red); }
+.report-warning { color: #b45309; }
+.report-ok { color: var(--bb-green); }
+
+@media (max-width: 575px) {
+    .slot-label { width: 100%; }
+}

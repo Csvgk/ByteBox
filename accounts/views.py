@@ -25,4 +25,5 @@ def register(request):
 @login_required
 def profile(request):
     orders = request.user.orders.all()
-    return render(request, 'accounts/profile.html', {'orders': orders})
+    builds = request.user.builds.all()
+    return render(request, 'accounts/profile.html', {'orders': orders, 'builds': builds})

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Готові ПК{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <div>
+            <span class="eyebrow text-primary">Перевірено на сумісність</span>
+            <h1 class="page-title mb-0">Готові комп'ютери</h1>
+        </div>
+        <a href="{% url 'builder:configurator' %}" class="btn btn-outline-primary"><i class="bi bi-tools"></i> Зібрати самому</a>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{% url 'builder:build_list' %}" class="btn btn-sm {% if not purpose %}btn-accent{% else %}btn-light{% endif %}">Усі</a>
+        {% for value, label in purposes %}
+        <a href="?purpose={{ value }}" class="btn btn-sm {% if purpose == value %}btn-accent{% else %}btn-light{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4">
+        {% for build in builds %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card build-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <span class="badge purpose-badge mb-2">{{ build.get_purpose_display }}</span>
+                    <h2 class="h4 fw-bold"><a class="text-reset text-decoration-none" href="{{ build.get_absolute_url }}">{{ build.name }}</a></h2>
+                    <p class="text-secondary">{{ build.description }}</p>
+                    <ul class="list-unstyled build-specs">
+                        {% for slot, label, product in build.components %}{% if product %}
+                        <li><span>{{ label }}</span>{{ product.brand.name }} {{ product.name }}</li>
+                        {% endif %}{% endfor %}
+                    </ul>
+                    <div class="mt-auto d-flex justify-content-between align-items-center pt-3">
+                        <span class="price">{{ build.total_price|floatformat:0|intcomma }} ₴</span>
+                        <a href="{{ build.get_absolute_url }}" class="btn btn-accent">Детальніше</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12"><div class="empty-state"><i class="bi bi-pc-display"></i><p>Готових збірок поки немає.</p></div></div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
