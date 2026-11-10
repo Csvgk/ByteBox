@@ -1,10 +1,17 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import F, Q
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
 
 from blog.models import Post
 
-from .models import Brand, Category, Product
+from .cart import Cart
+from .forms import OrderForm
+from .models import Brand, Category, Order, OrderItem, Product
 
 SORT_OPTIONS = {
     'new': ('-created_at', 'Спочатку нові'),
@@ -92,3 +99,93 @@ def product_detail(request, slug):
     related = (Product.objects.filter(category=product.category, is_active=True)
                .exclude(id=product.id).select_related('category', 'brand')[:4])
     return render(request, 'shop/product_detail.html', {'product': product, 'related': related})
+
+
+# ---------------- Кошик ----------------
+
+def cart_detail(request):
+    cart = Cart(request)
+    return render(request, 'shop/cart.html', {'cart': cart, 'lines': list(cart), 'total': cart.total_price()})
+
+
+@require_POST
+def cart_add(request, product_id):
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+    if not product.in_stock:
+        messages.error(request, 'На жаль, цього товару немає в наявності.')
+    else:
+        quantity = int(request.POST.get('quantity', 1) or 1)
+        Cart(request).add(product, quantity)
+        messages.success(request, f'«{product.brand.name} {product.name}» додано в кошик.')
+    # Повертаємось туди, звідки натиснули кнопку (тільки на сторінки нашого ж сайту)
+    next_url = request.POST.get('next', '')
+    if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        return redirect(next_url)
+    return redirect('shop:cart_detail')
+
+
+@require_POST
+def cart_update(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Cart(request).set(product, int(request.POST.get('quantity', 1) or 0))
+    return redirect('shop:cart_detail')
+
+
+@require_POST
+def cart_remove(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Cart(request).remove(product)
+    messages.info(request, 'Товар прибрано з кошика.')
+    return redirect('shop:cart_detail')
+
+
+# ---------------- Замовлення ----------------
+
+@login_required
+def checkout(request):
+    cart = Cart(request)
+    lines = list(cart)
+    if not lines:
+        messages.info(request, 'Кошик порожній.')
+        return redirect('shop:catalog')
+
+    initial = {'full_name': request.user.get_full_name(), 'email': request.user.email}
+    form = OrderForm(request.POST or None, initial=initial)
+
+    if request.method == 'POST' and form.is_valid():
+        # transaction.atomic: або зберігається все замовлення разом зі списанням зі складу, або нічого
+        with transaction.atomic():
+            products = {p.id: p for p in Product.objects.select_for_update().filter(
+                id__in=[line['product'].id for line in lines])}
+
+            # Перевіряємо залишки ще раз — поки людина оформлювала, товар могли купити
+            for line in lines:
+                product = products[line['product'].id]
+                if product.stock < line['quantity']:
+                    messages.error(request, f'«{product.name}»: на складі залишилось лише {product.stock} шт.')
+                    return redirect('shop:cart_detail')
+
+            order = form.save(commit=False)
+            order.user = request.user
+            order.total = cart.total_price()
+            order.save()
+
+            for line in lines:
+                product = products[line['product'].id]
+                OrderItem.objects.create(order=order, product=product, name=f'{product.brand.name} {product.name}',
+                                         price=product.price, quantity=line['quantity'])
+                product.stock -= line['quantity']
+                product.save(update_fields=['stock'])
+
+        cart.clear()
+        messages.success(request, f'Дякуємо! Замовлення №{order.id} прийнято.')
+        return redirect(order.get_absolute_url())
+
+    return render(request, 'shop/checkout.html', {'form': form, 'lines': lines, 'total': cart.total_price()})
+
+
+@login_required
+def order_detail(request, order_id):
+    # user=request.user — чужі замовлення переглянути не можна
+    order = get_object_or_404(Order.objects.prefetch_related('items'), id=order_id, user=request.user)
+    return render(request, 'shop/order_detail.html', {'order': order})

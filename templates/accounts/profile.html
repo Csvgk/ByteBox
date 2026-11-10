@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 {% block title %}Мій профіль{% endblock %}
 {% block content %}
 <div class="container py-4">
@@ -16,8 +17,27 @@
         <div class="col-12 col-lg-8">
             {% block profile_content %}
             <div class="panel">
-                <h2 class="h5">Мої замовлення</h2>
-                <p class="text-secondary mb-0">Замовлень поки немає.</p>
+                <h2 class="h5 fw-bold">Мої замовлення</h2>
+                {% if orders %}
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead><tr><th>№</th><th>Дата</th><th>Сума</th><th>Статус</th><th></th></tr></thead>
+                        <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.created_at|date:"d.m.Y" }}</td>
+                            <td>{{ order.total|floatformat:0|intcomma }} ₴</td>
+                            <td><span class="status status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                            <td><a href="{{ order.get_absolute_url }}">Детальніше</a></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-secondary mb-0">Замовлень поки немає. <a href="{% url 'shop:catalog' %}">Перейти до каталогу</a></p>
+                {% endif %}
             </div>
             {% endblock %}
         </div>

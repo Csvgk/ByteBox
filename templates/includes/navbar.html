@@ -29,6 +29,12 @@
             </form>
 
             <ul class="navbar-nav align-items-lg-center gap-lg-2">
+                <li class="nav-item">
+                    <a class="nav-link nav-icon" href="{% url 'shop:cart_detail' %}" aria-label="Кошик">
+                        <i class="bi bi-cart3"></i>{% if cart_count %}<span class="cart-count">{{ cart_count }}</span>{% endif %}
+                        <span class="d-lg-none ms-1">Кошик</span>
+                    </a>
+                </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

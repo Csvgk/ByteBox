@@ -30,7 +30,12 @@
                 </div>
                 {% if product.in_stock %}
                 <p class="stock in mb-3"><i class="bi bi-check-circle"></i> Є в наявності ({{ product.stock }} шт.)</p>
-                {% block buy_form %}{% endblock %}
+                <form method="post" action="{% url 'shop:cart_add' product.id %}" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control qty-input" aria-label="Кількість">
+                    <button type="submit" class="btn btn-accent flex-grow-1"><i class="bi bi-cart-plus"></i> Додати в кошик</button>
+                </form>
                 {% else %}
                 <p class="stock out mb-0"><i class="bi bi-x-circle"></i> Немає в наявності</p>
                 {% endif %}

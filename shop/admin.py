@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Brand, Category, Product
+from .models import Brand, Category, Order, OrderItem, Product
 
 
 @admin.register(Category)
@@ -29,3 +29,18 @@ class ProductAdmin(admin.ModelAdmin):
         ('Сумісність', {'fields': ['socket', 'memory_type', 'form_factor', 'power_draw', 'psu_power']}),
         ('Інші характеристики', {'fields': ['specs']}),
     ]
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ['product', 'name', 'price', 'quantity']
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['id', 'full_name', 'phone', 'total', 'status', 'created_at']
+    list_filter = ['status', 'delivery', 'created_at']
+    list_editable = ['status']
+    search_fields = ['id', 'full_name', 'phone', 'email']
+    inlines = [OrderItemInline]

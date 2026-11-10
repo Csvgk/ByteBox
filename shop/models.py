@@ -143,3 +143,61 @@ class Product(models.Model):
                 key, value = line.split(':', 1)
                 result.append((key.strip(), value.strip()))
         return result
+
+
+class Order(models.Model):
+    class Status(models.TextChoices):
+        NEW = 'new', 'Нове'
+        CONFIRMED = 'confirmed', 'Підтверджене'
+        SHIPPED = 'shipped', 'Відправлене'
+        DONE = 'done', 'Виконане'
+        CANCELLED = 'cancelled', 'Скасоване'
+
+    class Delivery(models.TextChoices):
+        PICKUP = 'pickup', 'Самовивіз з магазину'
+        NOVA_POSHTA = 'nova_poshta', 'Нова пошта'
+        COURIER = 'courier', 'Кур\'єр'
+
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='orders', verbose_name='Покупець')
+    full_name = models.CharField("Ім'я та прізвище", max_length=150)
+    phone = models.CharField('Телефон', max_length=20)
+    email = models.EmailField('Email')
+    delivery = models.CharField('Доставка', max_length=20, choices=Delivery.choices, default=Delivery.NOVA_POSHTA)
+    address = models.CharField('Адреса / відділення', max_length=255, blank=True)
+    comment = models.TextField('Коментар', blank=True)
+    status = models.CharField('Статус', max_length=20, choices=Status.choices, default=Status.NEW)
+    total = models.DecimalField('Сума, грн', max_digits=12, decimal_places=2, default=0)
+    created_at = models.DateTimeField('Створено', auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Замовлення'
+        verbose_name_plural = 'Замовлення'
+
+    def __str__(self):
+        return f'Замовлення №{self.id}'
+
+    def get_absolute_url(self):
+        return reverse('shop:order_detail', args=[self.id])
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name='Замовлення')
+    # SET_NULL: якщо товар колись видалять, рядок замовлення залишиться в історії
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, related_name='order_items',
+                                verbose_name='Товар')
+    # Назву і ціну копіюємо: якщо ціна товару зміниться, у старому замовленні залишиться ціна покупки
+    name = models.CharField('Назва', max_length=255)
+    price = models.DecimalField('Ціна за шт.', max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField('Кількість', default=1)
+
+    class Meta:
+        verbose_name = 'Товар у замовленні'
+        verbose_name_plural = 'Товари в замовленні'
+
+    def __str__(self):
+        return f'{self.name} × {self.quantity}'
+
+    @property
+    def total(self):
+        return self.price * self.quantity

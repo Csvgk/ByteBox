@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Оформлення замовлення{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h1 class="page-title mb-4">Оформлення замовлення</h1>
+    <div class="row g-4">
+        <div class="col-12 col-lg-7">
+            <form method="post" class="panel" novalidate>
+                {% csrf_token %}
+                {% include 'includes/form_fields.html' %}
+                <button type="submit" class="btn btn-accent btn-lg w-100">Підтвердити замовлення</button>
+            </form>
+        </div>
+        <div class="col-12 col-lg-5">
+            <div class="panel">
+                <h2 class="h5 fw-bold">Ваше замовлення</h2>
+                {% for line in lines %}
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span>{{ line.product.brand.name }} {{ line.product.name }} × {{ line.quantity }}</span>
+                    <span class="text-nowrap ms-2">{{ line.total|floatformat:0|intcomma }} ₴</span>
+                </div>
+                {% endfor %}
+                <div class="d-flex justify-content-between fs-5 fw-bold mt-3"><span>Разом</span><span>{{ total|floatformat:0|intcomma }} ₴</span></div>
+                <p class="small text-secondary mt-3 mb-0">Оплата при отриманні. Менеджер зателефонує для підтвердження.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

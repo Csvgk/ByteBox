@@ -24,4 +24,5 @@ def register(request):
 
 @login_required
 def profile(request):
-    return render(request, 'accounts/profile.html')
+    orders = request.user.orders.all()
+    return render(request, 'accounts/profile.html', {'orders': orders})
