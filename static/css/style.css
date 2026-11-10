@@ -323,3 +323,27 @@ a { color: var(--bb-accent); }
 @media (max-width: 991px) {
     .search-form .form-control { min-width: 0; width: 100%; }
 }
+
+/* ---------- Акаунт ---------- */
+.auth-card { padding: 32px; }
+
+.auth-card input:not([type="checkbox"]) {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+}
+
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, var(--bb-accent), var(--bb-accent-2));
+    border-radius: 50%;
+}
