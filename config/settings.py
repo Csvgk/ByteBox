@@ -39,6 +39,10 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').sp
 # Адреси, з яких дозволено надсилати форми (потрібно на хостингу з https), наприклад https://csvgk.pythonanywhere.com
 CSRF_TRUSTED_ORIGINS = [url for url in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if url]
 
+# На хостингу (DEBUG=False) cookie сесії і CSRF передаються тільки через https
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
 
 # Application definition
 
