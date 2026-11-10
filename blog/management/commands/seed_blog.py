@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from blog.models import Category, Post, Tag
 from blog.utils import make_slug
@@ -108,10 +108,14 @@ class Command(BaseCommand):
     help = 'Створює демо-статті для блогу (автор — перший адміністратор)'
 
     def handle(self, *args, **options):
-        # Паролів у коді немає: адміністратора створюють командою createsuperuser
+        # Автор — перший адміністратор. Якщо його ще немає, створюємо службового автора «Редакція ByteBox»
+        # без пароля (увійти під ним неможливо, він лише підписує статті)
         admin = User.objects.filter(is_superuser=True).order_by('id').first()
         if not admin:
-            raise CommandError('Спочатку створіть адміністратора: python manage.py createsuperuser')
+            admin, created = User.objects.get_or_create(username='bytebox', defaults={'first_name': 'Редакція ByteBox'})
+            if created:
+                admin.set_unusable_password()
+                admin.save()
 
         for data in POSTS:
             category, _ = Category.objects.get_or_create(name=data['category'],

@@ -36,6 +36,9 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
+# Адреси, з яких дозволено надсилати форми (потрібно на хостингу з https), наприклад https://csvgk.pythonanywhere.com
+CSRF_TRUSTED_ORIGINS = [url for url in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if url]
+
 
 # Application definition
 
@@ -133,6 +136,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+# Сюди команда collectstatic збирає всю статику для хостингу
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Файли, які завантажують користувачі (фото товарів і обкладинки статей)
 MEDIA_URL = '/media/'
