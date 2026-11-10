@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Редагування коментаря{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-7">
+            <div class="panel">
+                <h1 class="h4 fw-bold mb-3">Редагування коментаря</h1>
+                <p class="text-secondary">До статті «<a href="{{ comment.post.get_absolute_url }}">{{ comment.post.title }}</a>»</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {% include 'includes/form_fields.html' %}
+                    <button class="btn btn-accent" type="submit">Зберегти</button>
+                    <a class="btn btn-link" href="{{ comment.post.get_absolute_url }}#comments">Скасувати</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

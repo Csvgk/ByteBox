@@ -6,6 +6,9 @@
     <span class="eyebrow text-primary">Зібрати самому</span>
     <h1 class="page-title">Конфігуратор ПК</h1>
     <p class="text-secondary">Обирайте деталі по черзі — ми покажемо лише сумісні варіанти і перевіримо збірку.</p>
+    {% if editing %}
+    <div class="alert alert-info"><i class="bi bi-pencil-square"></i> Ви редагуєте збірку «<a href="{{ editing.get_absolute_url }}">{{ editing.name }}</a>».</div>
+    {% endif %}
 
     <div class="row g-4">
         <div class="col-12 col-lg-8">
@@ -59,10 +62,17 @@
                 {% if has_errors %}<p class="small text-danger mt-1 mb-0">Виправте помилки сумісності, щоб купити збірку.</p>{% endif %}
 
                 {% if user.is_authenticated %}
+                {% if editing %}
+                <form method="post" action="{% url 'builder:configurator_save' %}" class="mt-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="mode" value="update">
+                    <button class="btn btn-primary w-100" type="submit"><i class="bi bi-save"></i> Зберегти зміни в «{{ editing.name }}»</button>
+                </form>
+                {% endif %}
                 <form method="post" action="{% url 'builder:configurator_save' %}" class="input-group mt-3">
                     {% csrf_token %}
                     <input type="text" name="name" class="form-control" placeholder="Назва збірки" maxlength="120" aria-label="Назва збірки">
-                    <button class="btn btn-outline-primary" type="submit">Зберегти</button>
+                    <button class="btn btn-outline-primary" type="submit">{% if editing %}Зберегти як нову{% else %}Зберегти{% endif %}</button>
                 </form>
                 {% else %}
                 <p class="small mt-3 mb-0"><a href="{% url 'accounts:login' %}?next={{ request.path }}">Увійдіть</a>, щоб зберегти збірку в профілі.</p>

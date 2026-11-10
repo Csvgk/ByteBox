@@ -53,6 +53,7 @@
                     <button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-sliders"></i> Змінити в конфігураторі</button>
                 </form>
                 {% if build.user == user %}
+                <a href="{% url 'builder:build_update' build.slug %}" class="btn btn-light w-100 mt-2"><i class="bi bi-pencil"></i> Змінити назву і опис</a>
                 <form method="post" action="{% url 'builder:build_delete' build.slug %}" class="mt-2" onsubmit="return confirm('Видалити збірку?')">
                     {% csrf_token %}
                     <button class="btn btn-link text-danger w-100" type="submit">Видалити збірку</button>

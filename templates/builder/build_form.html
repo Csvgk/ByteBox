@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Редагування збірки{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-7">
+            <div class="panel">
+                <h1 class="page-title mb-4">Редагування збірки</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    {% include 'includes/form_fields.html' %}
+                    <p class="small text-secondary">Щоб замінити деталі, відкрийте збірку в конфігураторі і натисніть «Зберегти зміни».</p>
+                    <button class="btn btn-accent" type="submit">Зберегти</button>
+                    <a class="btn btn-link" href="{{ build.get_absolute_url }}">Скасувати</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

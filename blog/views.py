@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from .forms import CommentForm, PostForm
-from .models import Category, Post, Tag
+from .models import Category, Comment, Post, Tag
 
 
 def sidebar():
@@ -89,3 +90,38 @@ def post_update(request, slug):
         messages.success(request, 'Статтю оновлено.')
         return redirect(post.get_absolute_url())
     return render(request, 'blog/post_form.html', {'form': form, 'title': 'Редагування статті', 'post': post})
+
+
+@login_required
+@permission_required('blog.delete_post', raise_exception=True)
+def post_delete(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    if request.method == 'POST':
+        post.delete()
+        messages.info(request, f'Статтю «{post.title}» видалено.')
+        return redirect('blog:post_list')
+    # GET — сторінка підтвердження «Ви впевнені?»
+    return render(request, 'blog/post_confirm_delete.html', {'post': post})
+
+
+# ---------- Коментарі: змінити або видалити можна лише свій ----------
+
+@login_required
+def comment_update(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, author=request.user)
+    form = CommentForm(request.POST or None, instance=comment)
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Коментар оновлено.')
+        return redirect(comment.post.get_absolute_url() + '#comments')
+    return render(request, 'blog/comment_form.html', {'form': form, 'comment': comment})
+
+
+@login_required
+@require_POST
+def comment_delete(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, author=request.user)
+    post_url = comment.post.get_absolute_url()
+    comment.delete()
+    messages.info(request, 'Коментар видалено.')
+    return redirect(post_url + '#comments')

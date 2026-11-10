@@ -9,6 +9,7 @@ urlpatterns = [
     path('builds/', views.build_list, name='build_list'),
     path('builds/<slug:slug>/', views.build_detail, name='build_detail'),
     path('builds/<slug:slug>/to-cart/', views.build_add_to_cart, name='build_add_to_cart'),
+    path('builds/<slug:slug>/edit/', views.build_update, name='build_update'),
     path('builds/<slug:slug>/delete/', views.build_delete, name='build_delete'),
     # Конфігуратор
     path('configurator/', views.configurator, name='configurator'),

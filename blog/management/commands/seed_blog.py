@@ -1,12 +1,8 @@
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from blog.models import Category, Post, Tag
 from blog.utils import make_slug
-
-# Тестовий адміністратор (тільки для локальної розробки)
-ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = None  # пароль видалено з історії
 
 POSTS = [
     {
@@ -109,13 +105,13 @@ POSTS = [
 
 
 class Command(BaseCommand):
-    help = 'Створює тестового адміністратора і демо-статті для блогу'
+    help = 'Створює демо-статті для блогу (автор — перший адміністратор)'
 
     def handle(self, *args, **options):
-        admin = User.objects.filter(username=ADMIN_USERNAME).first()
+        # Паролів у коді немає: адміністратора створюють командою createsuperuser
+        admin = User.objects.filter(is_superuser=True).order_by('id').first()
         if not admin:
-            admin = User.objects.create_superuser(ADMIN_USERNAME, 'admin@example.com', ADMIN_PASSWORD,
-                                                  first_name='Адміністратор')
+            raise CommandError('Спочатку створіть адміністратора: python manage.py createsuperuser')
 
         for data in POSTS:
             category, _ = Category.objects.get_or_create(name=data['category'],

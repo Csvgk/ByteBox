@@ -16,6 +16,7 @@
                 <i class="bi bi-person"></i> {{ post.author.get_full_name|default:post.author.username }}
                 · <i class="bi bi-calendar"></i> {{ post.created_at|date:"d.m.Y" }}
                 {% if perms.blog.change_post %}· <a href="{% url 'blog:post_update' post.slug %}"><i class="bi bi-pencil"></i> Редагувати</a>{% endif %}
+                {% if perms.blog.delete_post %}· <a class="text-danger" href="{% url 'blog:post_delete' post.slug %}"><i class="bi bi-trash"></i> Видалити</a>{% endif %}
             </p>
             <img src="{{ post.image_url }}" class="article-cover mb-4" alt="{{ post.title }}">
             <p class="lead">{{ post.excerpt }}</p>
@@ -36,6 +37,15 @@
                         <strong>{{ comment.author.first_name|default:comment.author.username }}</strong>
                         <span class="text-secondary small">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
                         <p class="mb-0">{{ comment.text|linebreaksbr }}</p>
+                        {% if comment.author == user %}
+                        <div class="d-flex gap-3 small mt-1">
+                            <a href="{% url 'blog:comment_update' comment.pk %}">Редагувати</a>
+                            <form method="post" action="{% url 'blog:comment_delete' comment.pk %}" onsubmit="return confirm('Видалити коментар?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link btn-sm p-0 text-danger">Видалити</button>
+                            </form>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% empty %}
