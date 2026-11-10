@@ -26,7 +26,7 @@ class ProductAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Основне', {'fields': ['category', 'brand', 'name', 'slug', 'description', 'image']}),
         ('Ціна і склад', {'fields': ['price', 'old_price', 'stock', 'is_active']}),
-        ('Сумісність', {'fields': ['socket', 'memory_type', 'form_factor', 'power_draw', 'psu_power']}),
+        ('Сумісність', {'fields': ['socket', 'memory_type', 'form_factor', 'power_draw', 'psu_power', 'integrated_graphics']}),
         ('Інші характеристики', {'fields': ['specs']}),
     ]
 

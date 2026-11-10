@@ -87,6 +87,8 @@ class Product(models.Model):
     power_draw = models.PositiveIntegerField('Споживання, Вт', default=0,
                                              help_text='Скільки енергії споживає деталь')
     psu_power = models.PositiveIntegerField('Потужність БЖ, Вт', default=0, help_text='Тільки для блоків живлення')
+    integrated_graphics = models.BooleanField('Вбудована графіка', default=False,
+                                              help_text='Для процесорів: чи можна обійтись без відеокарти')
 
     # Інші характеристики просто для показу: кожен рядок у форматі «Назва: значення»
     specs = models.TextField('Інші характеристики', blank=True,
@@ -134,6 +136,8 @@ class Product(models.Model):
             result.append(('Тип пам\'яті', self.memory_type))
         if self.form_factor:
             result.append(('Форм-фактор', self.get_form_factor_display()))
+        if self.category.kind == Category.Kind.CPU:
+            result.append(('Вбудована графіка', 'є' if self.integrated_graphics else 'немає'))
         if self.psu_power:
             result.append(('Потужність', f'{self.psu_power} Вт'))
         elif self.power_draw:
