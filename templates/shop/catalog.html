@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}{% if category %}{{ category.name }}{% else %}Каталог{% endif %}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'shop:home' %}">Головна</a></li>
+            <li class="breadcrumb-item{% if not category %} active{% endif %}"><a href="{% url 'shop:catalog' %}">Каталог</a></li>
+            {% if category %}<li class="breadcrumb-item active">{{ category.name }}</li>{% endif %}
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+        <div>
+            <h1 class="page-title mb-0">{% if category %}{{ category.name }}{% else %}Усі товари{% endif %}</h1>
+            <p class="text-secondary mb-0">
+                Знайдено: {{ total }}{% if query %} за запитом «{{ query }}»{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Фільтри: звичайна GET-форма, тому всі параметри потрапляють в адресу -->
+        <aside class="col-12 col-lg-3">
+            <form method="get" class="filter-card">
+                {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+
+                <h6>Категорія</h6>
+                <select name="category" class="form-select mb-3">
+                    <option value="">Усі категорії</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.slug }}" {% if category == cat %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <h6>Ціна, ₴</h6>
+                <div class="d-flex gap-2 mb-3">
+                    <input type="number" name="min_price" class="form-control" placeholder="від" min="0" value="{{ min_price }}">
+                    <input type="number" name="max_price" class="form-control" placeholder="до" min="0" value="{{ max_price }}">
+                </div>
+
+                <h6>Бренд</h6>
+                <div class="mb-3 brand-list">
+                    {% for brand in brands %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="brand" value="{{ brand.slug }}" id="brand-{{ brand.slug }}"
+                               {% if brand.slug in selected_brands %}checked{% endif %}>
+                        <label class="form-check-label" for="brand-{{ brand.slug }}">{{ brand.name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" name="in_stock" value="1" id="inStock"
+                           {% if in_stock_only %}checked{% endif %}>
+                    <label class="form-check-label" for="inStock">Тільки в наявності</label>
+                </div>
+
+                <h6>Сортування</h6>
+                <select name="sort" class="form-select mb-3">
+                    {% for key, label in sort_options %}
+                    <option value="{{ key }}" {% if key == sort %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="btn btn-accent w-100">Застосувати</button>
+                <a href="{% url 'shop:catalog' %}" class="btn btn-link w-100 mt-1">Скинути фільтри</a>
+            </form>
+        </aside>
+
+        <section class="col-12 col-lg-9">
+            <div class="row g-4">
+                {% for product in page_obj %}
+                <div class="col-12 col-sm-6 col-xl-4">{% include 'includes/product_card.html' %}</div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">
+                        <i class="bi bi-search"></i>
+                        <p>Нічого не знайдено. Спробуйте змінити фільтри.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if page_obj.paginator.num_pages > 1 %}
+            <!-- {% templatetag openblock %} querystring {% templatetag closeblock %} зберігає всі фільтри і міняє лише номер сторінки -->
+            <nav class="mt-4" aria-label="Сторінки">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="{% querystring page=page_obj.previous_page_number %}">←</a></li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                        <a class="page-link" href="{% querystring page=num %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="{% querystring page=page_obj.next_page_number %}">→</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

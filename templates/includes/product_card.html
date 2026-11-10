@@ -1,0 +1,22 @@
+{% load humanize %}
+<div class="card product-card h-100">
+    <a href="{{ product.get_absolute_url }}" class="product-img">
+        <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+        {% if product.discount_percent %}<span class="badge badge-sale">-{{ product.discount_percent }}%</span>{% endif %}
+    </a>
+    <div class="card-body d-flex flex-column">
+        <p class="product-meta mb-1">{{ product.category.name }} · {{ product.brand.name }}</p>
+        <h3 class="product-title"><a href="{{ product.get_absolute_url }}">{{ product.brand.name }} {{ product.name }}</a></h3>
+        <div class="mt-auto">
+            <div class="d-flex align-items-baseline gap-2 mb-2">
+                <span class="price">{{ product.price|floatformat:0|intcomma }} ₴</span>
+                {% if product.discount_percent %}<span class="old-price">{{ product.old_price|floatformat:0|intcomma }} ₴</span>{% endif %}
+            </div>
+            {% if product.in_stock %}
+            <span class="stock in"><i class="bi bi-check-circle"></i> Є в наявності</span>
+            {% else %}
+            <span class="stock out"><i class="bi bi-x-circle"></i> Немає в наявності</span>
+            {% endif %}
+        </div>
+    </div>
+</div>

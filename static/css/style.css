@@ -1,0 +1,325 @@
+/* ByteBox — власні стилі поверх Bootstrap 5 */
+
+:root {
+    --bb-dark: #0b1220;
+    --bb-dark-2: #111a2e;
+    --bb-accent: #4f8cff;
+    --bb-accent-2: #7c5cff;
+    --bb-text: #1e293b;
+    --bb-muted: #64748b;
+    --bb-bg: #f4f6fb;
+    --bb-line: #e2e8f0;
+    --bb-green: #16a34a;
+    --bb-red: #dc2626;
+}
+
+body {
+    font-family: 'Inter', Arial, sans-serif;
+    color: var(--bb-text);
+    background: var(--bb-bg);
+}
+
+a { color: var(--bb-accent); }
+
+/* ---------- Навігація ---------- */
+.site-nav {
+    background: rgba(11, 18, 32, 0.96);
+    backdrop-filter: blur(6px);
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+}
+
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--bb-accent), var(--bb-accent-2));
+}
+
+.search-form .form-control {
+    min-width: 240px;
+    color: #fff;
+    background: var(--bb-dark-2);
+    border-color: #26324d;
+}
+
+.search-form .form-control::placeholder { color: #8a99b8; }
+
+.nav-icon {
+    position: relative;
+    font-size: 1.3rem;
+}
+
+.cart-count {
+    position: absolute;
+    top: 2px;
+    right: -6px;
+    min-width: 18px;
+    padding: 0 5px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    color: #fff;
+    background: var(--bb-red);
+    border-radius: 9px;
+}
+
+/* ---------- Кнопки ---------- */
+.btn-accent {
+    color: #fff;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--bb-accent), var(--bb-accent-2));
+    border: 0;
+    border-radius: 10px;
+}
+
+.btn-accent:hover,
+.btn-accent:focus {
+    color: #fff;
+    filter: brightness(1.1);
+}
+
+.link-accent {
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+    padding: 70px 0;
+    color: #fff;
+    background:
+        radial-gradient(circle at 80% 20%, rgba(124, 92, 255, 0.35), transparent 45%),
+        radial-gradient(circle at 10% 90%, rgba(79, 140, 255, 0.3), transparent 40%),
+        var(--bb-dark);
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8fb3ff;
+}
+
+.hero-title {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.hero-text {
+    max-width: 560px;
+    margin: 18px 0 28px;
+    font-size: 1.1rem;
+    color: #c7d2fe;
+}
+
+.hero-img {
+    width: 100%;
+    border-radius: 24px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- Заголовки ---------- */
+.section-title {
+    margin-bottom: 20px;
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.page-title {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800;
+}
+
+/* ---------- Категорії ---------- */
+.category-tile {
+    display: block;
+    overflow: hidden;
+    color: var(--bb-text);
+    text-decoration: none;
+    background: #fff;
+    border: 1px solid var(--bb-line);
+    border-radius: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.category-tile img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+.category-tile span {
+    display: block;
+    padding: 12px 14px;
+    font-weight: 700;
+}
+
+.category-tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+/* ---------- Картка товару ---------- */
+.product-card {
+    overflow: hidden;
+    border: 1px solid var(--bb-line);
+    border-radius: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+.product-img,
+.detail-img {
+    position: relative;
+    display: block;
+}
+
+.product-img img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+.detail-img img {
+    width: 100%;
+    border-radius: 20px;
+}
+
+.badge-sale {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    background: var(--bb-red);
+    border-radius: 8px;
+}
+
+.product-meta {
+    font-size: 0.8rem;
+    color: var(--bb-muted);
+}
+
+.product-title {
+    margin-bottom: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.product-title a {
+    color: var(--bb-text);
+    text-decoration: none;
+}
+
+.product-title a:hover { color: var(--bb-accent); }
+
+.price {
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.price-lg { font-size: 2rem; }
+
+.old-price {
+    color: var(--bb-muted);
+    text-decoration: line-through;
+}
+
+.stock {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.stock.in { color: var(--bb-green); }
+.stock.out { color: var(--bb-red); }
+
+/* ---------- Каталог ---------- */
+.filter-card,
+.buy-box,
+.panel {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid var(--bb-line);
+    border-radius: 16px;
+}
+
+.filter-card h6 {
+    font-weight: 700;
+}
+
+.brand-list {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.empty-state {
+    padding: 50px 20px;
+    text-align: center;
+    color: var(--bb-muted);
+    background: #fff;
+    border: 1px dashed var(--bb-line);
+    border-radius: 16px;
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+}
+
+.pagination .page-link { color: var(--bb-text); }
+
+.pagination .active .page-link {
+    color: #fff;
+    background: var(--bb-accent);
+    border-color: var(--bb-accent);
+}
+
+/* ---------- Сторінка товару ---------- */
+.spec-table th {
+    width: 45%;
+    font-weight: 500;
+    color: var(--bb-muted);
+}
+
+/* ---------- Футер ---------- */
+.site-footer {
+    color: #cbd5e1;
+    background: var(--bb-dark);
+}
+
+.site-footer h6 {
+    color: #fff;
+    font-weight: 700;
+}
+
+.site-footer a {
+    color: #cbd5e1;
+    text-decoration: none;
+}
+
+.site-footer a:hover { color: #fff; }
+
+@media (max-width: 991px) {
+    .search-form .form-control { min-width: 0; width: 100%; }
+}

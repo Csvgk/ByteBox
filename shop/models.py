@@ -1,4 +1,5 @@
 from django.db import models
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.text import slugify
 
@@ -106,6 +107,13 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('shop:product_detail', args=[self.slug])
+
+    @property
+    def image_url(self):
+        """Фото товару, а якщо його не завантажили — картинка-заглушка категорії."""
+        if self.image:
+            return self.image.url
+        return static(f'img/categories/{self.category.kind}.svg')
 
     @property
     def in_stock(self):
