@@ -101,7 +101,12 @@ class Build(models.Model):
 
     @property
     def image_url(self):
-        return self.image.url if self.image else static('img/categories/case.svg')
+        # Власне фото збірки, інакше — фото корпусу, з якого вона складається
+        if self.image:
+            return self.image.url
+        if self.case:
+            return self.case.image_url
+        return static('img/categories/case.svg')
 
     def compatibility(self):
         # Імпорт усередині методу, бо compatibility.py сам імпортує SLOTS з цього файлу
