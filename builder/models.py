@@ -10,7 +10,6 @@ from shop.models import Category, Product
 
 K = Category.Kind
 
-# Слоти збірки: (назва поля, тип категорії, підпис, чи обов'язковий)
 SLOTS = [
     ('cpu', K.CPU, 'Процесор', True),
     ('motherboard', K.MOTHERBOARD, 'Материнська плата', True),
@@ -24,14 +23,11 @@ SLOT_NAMES = [slot[0] for slot in SLOTS]
 
 
 def component_field(kind, label, required=True):
-    """Поле-посилання на товар певної категорії. limit_choices_to — в адмінці показуються лише товари цієї категорії."""
     return models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=not required,
                              related_name='+', verbose_name=label, limit_choices_to={'category__kind': kind})
 
 
 class Build(models.Model):
-    """Збірка ПК: або готова (від магазину), або збережена користувачем з конфігуратора."""
-
     class Purpose(models.TextChoices):
         OFFICE = 'office', 'Офіс і навчання'
         GAMING = 'gaming', 'Ігри'
@@ -78,10 +74,8 @@ class Build(models.Model):
     def get_absolute_url(self):
         return reverse('builder:build_detail', args=[self.slug])
 
-    # ---------- Робота з деталями ----------
 
     def components(self):
-        """Список рядків (слот, підпис, товар або None) у фіксованому порядку."""
         return [(name, label, getattr(self, name)) for name, _, label, _ in SLOTS]
 
     def products(self):
@@ -101,7 +95,6 @@ class Build(models.Model):
 
     @property
     def image_url(self):
-        # Власне фото збірки, інакше — фото корпусу, з якого вона складається
         if self.image:
             return self.image.url
         if self.case:
@@ -109,6 +102,5 @@ class Build(models.Model):
         return static('img/categories/case.svg')
 
     def compatibility(self):
-        # Імпорт усередині методу, бо compatibility.py сам імпортує SLOTS з цього файлу
         from .compatibility import check_build
         return check_build(self)

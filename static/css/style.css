@@ -1,5 +1,3 @@
-/* ByteBox — власні стилі поверх Bootstrap 5 */
-
 :root {
     --bb-dark: #0b1220;
     --bb-dark-2: #111a2e;
@@ -21,7 +19,6 @@ body {
 
 a { color: var(--bb-accent); }
 
-/* ---------- Навігація ---------- */
 .site-nav {
     background: rgba(11, 18, 32, 0.96);
     backdrop-filter: blur(6px);
@@ -76,7 +73,6 @@ a { color: var(--bb-accent); }
     border-radius: 9px;
 }
 
-/* ---------- Кнопки ---------- */
 .btn-accent {
     color: #fff;
     font-weight: 600;
@@ -96,7 +92,6 @@ a { color: var(--bb-accent); }
     text-decoration: none;
 }
 
-/* ---------- Hero ---------- */
 .hero {
     padding: 70px 0;
     color: #fff;
@@ -135,7 +130,6 @@ a { color: var(--bb-accent); }
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
 }
 
-/* ---------- Заголовки ---------- */
 .section-title {
     margin-bottom: 20px;
     font-size: 1.6rem;
@@ -147,7 +141,6 @@ a { color: var(--bb-accent); }
     font-weight: 800;
 }
 
-/* ---------- Категорії ---------- */
 .category-tile {
     display: block;
     overflow: hidden;
@@ -176,7 +169,6 @@ a { color: var(--bb-accent); }
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
 }
 
-/* ---------- Картка товару ---------- */
 .product-card {
     overflow: hidden;
     border: 1px solid var(--bb-line);
@@ -255,7 +247,6 @@ a { color: var(--bb-accent); }
 .stock.in { color: var(--bb-green); }
 .stock.out { color: var(--bb-red); }
 
-/* ---------- Каталог ---------- */
 .filter-card,
 .buy-box,
 .panel {
@@ -295,14 +286,12 @@ a { color: var(--bb-accent); }
     border-color: var(--bb-accent);
 }
 
-/* ---------- Сторінка товару ---------- */
 .spec-table th {
     width: 45%;
     font-weight: 500;
     color: var(--bb-muted);
 }
 
-/* ---------- Футер ---------- */
 .site-footer {
     color: #cbd5e1;
     background: var(--bb-dark);
@@ -324,7 +313,6 @@ a { color: var(--bb-accent); }
     .search-form .form-control { min-width: 0; width: 100%; }
 }
 
-/* ---------- Акаунт ---------- */
 .auth-card { padding: 32px; }
 
 .auth-card input:not([type="checkbox"]) {
@@ -348,7 +336,6 @@ a { color: var(--bb-accent); }
     border-radius: 50%;
 }
 
-/* ---------- Блог ---------- */
 .post-card {
     overflow: hidden;
     border: 1px solid var(--bb-line);
@@ -398,7 +385,6 @@ a { color: var(--bb-accent); }
     font-size: 1rem;
 }
 
-/* ---------- Кошик і замовлення ---------- */
 .qty-input { width: 80px; }
 
 .cart-line {
@@ -437,7 +423,6 @@ a { color: var(--bb-accent); }
 .status-done { color: #15803d; background: #dcfce7; }
 .status-cancelled { color: #b91c1c; background: #fee2e2; }
 
-/* ---------- Збірки і конфігуратор ---------- */
 .build-card {
     overflow: hidden;
     border: 1px solid var(--bb-line);
@@ -495,7 +480,6 @@ a { color: var(--bb-accent); }
     color: var(--bb-muted);
 }
 
-/* Підсумок «прилипає» збоку лише на широких екранах */
 @media (min-width: 992px) {
     .summary-sticky {
         position: sticky;

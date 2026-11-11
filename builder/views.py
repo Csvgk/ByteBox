@@ -13,14 +13,10 @@ from .forms import BuildForm
 from .models import SLOT_NAMES, SLOTS, Build
 
 SESSION_KEY = 'configurator'
-# id власної збірки, яку зараз редагують у конфігураторі (щоб «Зберегти зміни» оновило її, а не створило нову)
 EDITING_KEY = 'configurator_editing'
 
 
-# ---------------- Допоміжні функції ----------------
-
 def get_slot(slot):
-    """Повертає опис слота (назва, тип категорії, підпис, обов'язковість) або 404."""
     for item in SLOTS:
         if item[0] == slot:
             return item
@@ -28,10 +24,6 @@ def get_slot(slot):
 
 
 def draft_build(request):
-    """
-    Чернетка конфігуратора: незбережений об'єкт Build, зібраний з id товарів у сесії.
-    Так ми використовуємо ту саму перевірку сумісності, що й для готових збірок.
-    """
     draft = request.session.get(SESSION_KEY, {})
     products = Product.objects.filter(id__in=draft.values()).select_related('category', 'brand')
     by_id = {p.id: p for p in products}
@@ -60,14 +52,11 @@ def add_build_to_cart(request, build):
 
 
 def get_visible_build(request, slug):
-    """Готову збірку бачать усі, а збережену — тільки її власник."""
     visible = Q(is_prebuilt=True)
     if request.user.is_authenticated:
         visible |= Q(user=request.user)
     return get_object_or_404(Build.objects.filter(visible), slug=slug)
 
-
-# ---------------- Готові збірки ----------------
 
 def build_list(request):
     builds = Build.objects.filter(is_prebuilt=True).select_related(*SLOT_NAMES)
@@ -93,7 +82,6 @@ def build_add_to_cart(request, slug):
 
 @login_required
 def build_update(request, slug):
-    # user=request.user: редагувати можна лише свою збірку, чужа дасть 404
     build = get_object_or_404(Build, slug=slug, user=request.user)
     form = BuildForm(request.POST or None, instance=build)
     if form.is_valid():
@@ -113,8 +101,6 @@ def build_delete(request, slug):
     messages.info(request, f'Збірку «{build.name}» видалено.')
     return redirect('accounts:profile')
 
-
-# ---------------- Конфігуратор ----------------
 
 def configurator(request):
     build = draft_build(request)
@@ -136,7 +122,6 @@ def configurator(request):
 def configurator_choose(request, slot):
     slot_name, kind, label, _ = get_slot(slot)
     build = draft_build(request)
-    # Поточну деталь у цьому слоті не враховуємо, інакше вона обмежувала б сама себе
     setattr(build, slot_name, None)
 
     all_products = Product.objects.filter(category__kind=kind, is_active=True).select_related('category', 'brand')
@@ -191,7 +176,6 @@ def configurator_save(request):
     if not build.products():
         messages.error(request, 'Збірка порожня — оберіть хоча б одну деталь.')
         return redirect('builder:configurator')
-    # «Зберегти зміни» — оновлюємо збірку, відкриту для редагування (тільки свою)
     editing_id = request.session.get(EDITING_KEY)
     if request.POST.get('mode') == 'update' and editing_id:
         existing = get_object_or_404(Build, id=editing_id, user=request.user)
@@ -212,10 +196,8 @@ def configurator_save(request):
 
 @require_POST
 def configurator_load(request, slug):
-    """Відкрити збірку (готову або свою) в конфігураторі, щоб щось у ній змінити."""
     build = get_visible_build(request, slug)
     save_draft(request, {slot: getattr(build, f'{slot}_id') for slot in SLOT_NAMES if getattr(build, f'{slot}_id')})
-    # Свою збірку можна потім зберегти поверх, готову — лише як нову копію
     if request.user.is_authenticated and build.user_id == request.user.id:
         request.session[EDITING_KEY] = build.id
     else:

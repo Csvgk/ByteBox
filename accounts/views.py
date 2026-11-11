@@ -14,7 +14,7 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # одразу входимо після реєстрації
+            login(request, user)
             messages.success(request, f'Вітаємо, {user.first_name}! Акаунт створено.')
             return redirect('shop:home')
     else:

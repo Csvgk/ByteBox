@@ -7,7 +7,6 @@ from .utils import make_slug
 
 
 class Category(models.Model):
-    """Рубрика блогу: новини, огляди, гайди..."""
     name = models.CharField('Назва', max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
 
@@ -34,8 +33,6 @@ class Tag(models.Model):
 
 
 class PublishedManager(models.Manager):
-    """Post.published.all() повертає тільки опубліковані статті."""
-
     def get_queryset(self):
         return super().get_queryset().filter(is_published=True)
 
@@ -69,7 +66,6 @@ class Post(models.Model):
         if not self.slug:
             base = make_slug(self.title) or 'post'
             slug, n = base, 2
-            # Якщо такий slug вже є, додаємо номер: post, post-2, post-3...
             while Post.objects.filter(slug=slug).exclude(pk=self.pk).exists():
                 slug = f'{base}-{n}'
                 n += 1

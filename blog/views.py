@@ -10,7 +10,6 @@ from .models import Category, Comment, Post, Tag
 
 
 def sidebar():
-    """Рубрики (з кількістю статей) і теги для бічної панелі."""
     return {
         'blog_categories': Category.objects.annotate(
             num_posts=Count('posts', filter=Q(posts__is_published=True))).filter(num_posts__gt=0),
@@ -65,7 +64,6 @@ def post_detail(request, slug):
     return render(request, 'blog/post_detail.html', context)
 
 
-# Писати статті можуть лише користувачі з правом blog.add_post (адміністратори і редактори)
 @login_required
 @permission_required('blog.add_post', raise_exception=True)
 def post_create(request):
@@ -74,7 +72,7 @@ def post_create(request):
         post = form.save(commit=False)
         post.author = request.user
         post.save()
-        form.save_m2m()  # теги зберігаються окремо, після збереження самої статті
+        form.save_m2m()
         messages.success(request, 'Статтю опубліковано.')
         return redirect(post.get_absolute_url())
     return render(request, 'blog/post_form.html', {'form': form, 'title': 'Нова стаття'})
@@ -100,11 +98,8 @@ def post_delete(request, slug):
         post.delete()
         messages.info(request, f'Статтю «{post.title}» видалено.')
         return redirect('blog:post_list')
-    # GET — сторінка підтвердження «Ви впевнені?»
     return render(request, 'blog/post_confirm_delete.html', {'post': post})
 
-
-# ---------- Коментарі: змінити або видалити можна лише свій ----------
 
 @login_required
 def comment_update(request, pk):

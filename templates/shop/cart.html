@@ -15,7 +15,6 @@
                         <a class="fw-bold text-reset text-decoration-none" href="{{ line.product.get_absolute_url }}">{{ line.product.brand.name }} {{ line.product.name }}</a>
                         <div class="text-secondary small">{{ line.product.price|floatformat:0|intcomma }} ₴ / шт.</div>
                     </div>
-                    <!-- Кількість змінюється окремою маленькою формою -->
                     <form method="post" action="{% url 'shop:cart_update' line.product.id %}" class="d-flex gap-1">
                         {% csrf_token %}
                         <input type="number" name="quantity" value="{{ line.quantity }}" min="1" max="{{ line.product.stock }}" class="form-control qty-input" aria-label="Кількість">

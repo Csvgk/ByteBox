@@ -4,8 +4,6 @@ from .models import Build
 
 
 class BuildForm(forms.ModelForm):
-    """Редагування назви і опису власної збірки (деталі змінюються в конфігураторі)."""
-
     class Meta:
         model = Build
         fields = ['name', 'description']

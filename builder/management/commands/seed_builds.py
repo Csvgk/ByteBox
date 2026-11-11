@@ -4,7 +4,6 @@ from builder.compatibility import check_build, has_errors
 from builder.models import Build
 from shop.models import Product
 
-# Готові збірки магазину: назва деталі -> слот
 PREBUILT = [
     {
         'name': 'ByteBox Office',

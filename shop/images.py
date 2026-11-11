@@ -1,10 +1,3 @@
-"""
-Генерація зображень товарів.
-
-Фото виробників захищені авторським правом, тому для кожного товару ми малюємо власну картинку
-в єдиному стилі магазину: іконка категорії, бренд, назва моделі і ключові характеристики.
-Картинка зберігається у звичайне поле Product.image — її завжди можна замінити справжнім фото в адмінці.
-"""
 import io
 import textwrap
 from pathlib import Path
@@ -16,7 +9,6 @@ from .models import Category
 
 FONTS_DIR = Path(__file__).resolve().parent / 'fonts'
 
-# Малюємо у 2 рази більше і зменшуємо в кінці — так краї ліній виходять гладкими
 SCALE = 2
 WIDTH, HEIGHT = 900, 675
 
@@ -50,19 +42,14 @@ def s(value):
 
 
 def gradient_background(color):
-    """Діагональний градієнт від кольору категорії до темного."""
     w, h = s(WIDTH), s(HEIGHT)
-    # Градієнт на квадраті з діагоналлю кадру, повертаємо і вирізаємо центр — перехід виходить плавним
     d = int((w ** 2 + h ** 2) ** 0.5)
     mask = Image.linear_gradient('L').resize((d, d)).rotate(-50)
     mask = mask.crop(((d - w) // 2, (d - h) // 2, (d - w) // 2 + w, (d - h) // 2 + h))
     return Image.composite(Image.new('RGB', (w, h), DARK), Image.new('RGB', (w, h), color), mask)
 
 
-# ---------- Іконки категорій (координати в «рамці» 320×240, як у SVG-заглушках) ----------
-
 def draw_icon(draw, kind, ox, oy, k):
-    """Малює іконку категорії. ox, oy — лівий верхній кут рамки, k — масштаб."""
     def p(x, y):
         return ox + x * k, oy + y * k
 
@@ -116,7 +103,7 @@ def draw_icon(draw, kind, ox, oy, k):
         line(130, 122, 190, 122, 5)
         line(139, 101, 181, 143, 5)
         line(181, 101, 139, 143, 5)
-    else:  # корпус
+    else:
         rect(115, 45, 205, 195, width=8, radius=8)
         circle(160, 80, 8, fill=WHITE)
         for y in (110, 125, 140):
@@ -124,7 +111,6 @@ def draw_icon(draw, kind, ox, oy, k):
 
 
 def spec_chips(product):
-    """Короткі «бейджі» з головними характеристиками."""
     chips = []
     if product.socket:
         chips.append(product.socket)
@@ -136,7 +122,6 @@ def spec_chips(product):
         chips.append(f'{product.psu_power} W')
     elif product.power_draw >= 20:
         chips.append(f'{product.power_draw} W')
-    # Перша характеристика з тексту, наприклад «Обсяг: 1 ТБ» -> «1 ТБ»
     for line in product.specs.splitlines():
         if ':' in line and len(chips) < 4:
             value = line.split(':', 1)[1].strip()
@@ -147,7 +132,6 @@ def spec_chips(product):
 
 
 def fit_title(draw, text, max_width):
-    """Підбирає розмір шрифту і переноси, щоб назва вмістилась у 2 рядки."""
     for size in (46, 42, 38, 34, 30):
         f = font('ExtraBold', size)
         for width in (22, 26, 30, 36, 44):
@@ -163,7 +147,6 @@ def render_product_image(product):
     color = CATEGORY_COLORS.get(kind, (79, 140, 255))
     img = gradient_background(color)
 
-    # Декоративні «доріжки плати» на фоні
     deco = Image.new('RGBA', img.size, (0, 0, 0, 0))
     dd = ImageDraw.Draw(deco)
     for i, y in enumerate((150, 230, 310)):
@@ -172,17 +155,14 @@ def render_product_image(product):
                 fill=(255, 255, 255, 40), width=s(3))
         dd.ellipse([x0 - s(7), s(y) - s(7), x0 + s(7), s(y) + s(7)], outline=(255, 255, 255, 60), width=s(3))
     img = Image.alpha_composite(img.convert('RGBA'), deco).convert('RGB')
-    # Режим 'RGBA' у Draw для RGB-картинки змішує напівпрозорі кольори з фоном
     draw = ImageDraw.Draw(img, 'RGBA')
 
-    # Мітка категорії
     label = product.category.name.upper()
     f_label = font('Bold', 18)
     tw = draw.textlength(label, font=f_label)
     draw.rounded_rectangle([s(36), s(32), s(36) + tw + s(36), s(72)], radius=s(20), fill=(255, 255, 255, 46))
     draw.text((s(54), s(41)), label, font=f_label, fill=WHITE)
 
-    # Знижка
     if product.discount_percent:
         sale = f'-{product.discount_percent}%'
         f_sale = font('ExtraBold', 24)
@@ -191,10 +171,8 @@ def render_product_image(product):
                                fill=(220, 38, 38))
         draw.text((s(WIDTH - 36) - sw - s(16), s(38)), sale, font=f_sale, fill=WHITE)
 
-    # Іконка категорії
     draw_icon(draw, kind, s(285), s(55), 1.2 * SCALE)
 
-    # Нижня панель з текстом
     panel_top = 370
     draw.rounded_rectangle([s(28), s(panel_top), s(WIDTH - 28), s(HEIGHT - 28)], radius=s(24), fill=(8, 12, 24, 190))
 
@@ -208,7 +186,6 @@ def render_product_image(product):
         draw.text((s(56), y), line, font=f_title, fill=WHITE)
         y += int(f_title.size * 1.18)
 
-    # Бейджі характеристик
     f_chip = font('Bold', 20)
     x, y = s(56), s(HEIGHT - 92)
     for chip in spec_chips(product):
@@ -227,7 +204,6 @@ def render_product_image(product):
 
 
 def generate_product_image(product, force=False):
-    """Створює і зберігає картинку товару. Не чіпає фото, завантажене вручну (якщо не force)."""
     if product.image and not force and not product.image.name.startswith('products/generated/'):
         return False
     if product.image:

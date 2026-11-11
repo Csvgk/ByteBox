@@ -108,8 +108,6 @@ class Command(BaseCommand):
     help = 'Створює демо-статті для блогу (автор — перший адміністратор)'
 
     def handle(self, *args, **options):
-        # Автор — перший адміністратор. Якщо його ще немає, створюємо службового автора «Редакція ByteBox»
-        # без пароля (увійти під ним неможливо, він лише підписує статті)
         admin = User.objects.filter(is_superuser=True).order_by('id').first()
         if not admin:
             admin, created = User.objects.get_or_create(username='bytebox', defaults={'first_name': 'Редакція ByteBox'})

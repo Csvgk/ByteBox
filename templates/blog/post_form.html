@@ -6,7 +6,6 @@
         <div class="col-12 col-lg-9">
             <div class="panel">
                 <h1 class="page-title mb-4">{{ title }}</h1>
-                <!-- enctype потрібен, щоб форма могла передати файл (обкладинку) -->
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {% include 'includes/form_fields.html' %}

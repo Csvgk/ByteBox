@@ -25,7 +25,6 @@ def home(request):
     products = Product.objects.filter(is_active=True).select_related('category', 'brand')
     context = {
         'categories': Category.objects.all(),
-        # Знижки: є стара ціна і вона більша за нову
         'sale_products': products.filter(old_price__gt=F('price'))[:4],
         'new_products': products[:8],
         'latest_posts': Post.published.select_related('category')[:3],
@@ -36,7 +35,6 @@ def home(request):
 def catalog(request):
     products = Product.objects.filter(is_active=True).select_related('category', 'brand')
 
-    # --- Фільтри з адреси, наприклад /catalog/?category=gpu&brand=msi&min_price=10000 ---
     category = None
     category_slug = request.GET.get('category')
     if category_slug:
@@ -68,11 +66,9 @@ def catalog(request):
         sort = 'new'
     products = products.order_by(SORT_OPTIONS[sort][0])
 
-    # --- Пагінація: по 9 товарів на сторінку ---
     paginator = Paginator(products, 9)
     page_obj = paginator.get_page(request.GET.get('page'))
 
-    # Бренди показуємо тільки ті, що є в обраній категорії
     brands = Brand.objects.all()
     if category:
         brands = brands.filter(products__category=category).distinct()
@@ -101,8 +97,6 @@ def product_detail(request, slug):
     return render(request, 'shop/product_detail.html', {'product': product, 'related': related})
 
 
-# ---------------- Кошик ----------------
-
 def cart_detail(request):
     cart = Cart(request)
     return render(request, 'shop/cart.html', {'cart': cart, 'lines': list(cart), 'total': cart.total_price()})
@@ -117,7 +111,6 @@ def cart_add(request, product_id):
         quantity = int(request.POST.get('quantity', 1) or 1)
         Cart(request).add(product, quantity)
         messages.success(request, f'«{product.brand.name} {product.name}» додано в кошик.')
-    # Повертаємось туди, звідки натиснули кнопку (тільки на сторінки нашого ж сайту)
     next_url = request.POST.get('next', '')
     if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
         return redirect(next_url)
@@ -139,8 +132,6 @@ def cart_remove(request, product_id):
     return redirect('shop:cart_detail')
 
 
-# ---------------- Замовлення ----------------
-
 @login_required
 def checkout(request):
     cart = Cart(request)
@@ -153,12 +144,10 @@ def checkout(request):
     form = OrderForm(request.POST or None, initial=initial)
 
     if request.method == 'POST' and form.is_valid():
-        # transaction.atomic: або зберігається все замовлення разом зі списанням зі складу, або нічого
         with transaction.atomic():
             products = {p.id: p for p in Product.objects.select_for_update().filter(
                 id__in=[line['product'].id for line in lines])}
 
-            # Перевіряємо залишки ще раз — поки людина оформлювала, товар могли купити
             for line in lines:
                 product = products[line['product'].id]
                 if product.stock < line['quantity']:
@@ -186,6 +175,5 @@ def checkout(request):
 
 @login_required
 def order_detail(request, order_id):
-    # user=request.user — чужі замовлення переглянути не можна
     order = get_object_or_404(Order.objects.prefetch_related('items'), id=order_id, user=request.user)
     return render(request, 'shop/order_detail.html', {'order': order})

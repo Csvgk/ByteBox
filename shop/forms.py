@@ -19,7 +19,6 @@ class OrderForm(forms.ModelForm):
 
     def clean(self):
         cleaned = super().clean()
-        # Для доставки адреса обов'язкова, для самовивозу — ні
         if cleaned.get('delivery') != Order.Delivery.PICKUP and not cleaned.get('address'):
             self.add_error('address', 'Вкажіть адресу або номер відділення.')
         return cleaned

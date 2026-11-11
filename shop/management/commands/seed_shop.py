@@ -18,8 +18,6 @@ CATEGORIES = [
     (K.CASE, 'Корпуси', 'cases'),
 ]
 
-# (тип, бренд, назва, ціна, стара ціна, залишок, {характеристики сумісності}, "інші характеристики")
-# Ціни демонстраційні
 PRODUCTS = [
     (K.CPU, 'AMD', 'Ryzen 5 5600', 3999, 4599, 12,
      {'socket': 'AM4', 'memory_type': 'DDR4', 'power_draw': 65},
@@ -88,7 +86,6 @@ PRODUCTS = [
     (K.CASE, 'Lian Li', 'Lancool 216', 4299, 4699, 4,
      {'form_factor': 'ATX'}, 'Підтримка плат: E-ATX, ATX, Micro-ATX\nВентиляторів у комплекті: 3'),
 
-    # ---------- Розширення каталогу ----------
     (K.CPU, 'AMD', 'Ryzen 7 5700X', 5999, 6499, 9,
      {'socket': 'AM4', 'memory_type': 'DDR4', 'power_draw': 65},
      'Ядер / потоків: 8 / 16\nЧастота: 3.4–4.6 ГГц\nКеш L3: 32 МБ'),
@@ -214,8 +211,6 @@ class Command(BaseCommand):
                     **compat,
                 },
             )
-            # Картинку перемальовуємо щоразу (ціна чи знижка могли змінитись), але фото, завантажене
-            # вручну через адмінку, не чіпаємо
             if not options['no_images'] and generate_product_image(product, force=False):
                 generated += 1
 

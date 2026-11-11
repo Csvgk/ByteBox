@@ -5,9 +5,6 @@ from django.utils.text import slugify
 
 
 class Category(models.Model):
-    """Категорія комплектуючих: процесори, відеокарти, корпуси..."""
-
-    # Тип категорії потрібен конфігуратору, щоб знати, яку деталь ми перевіряємо
     class Kind(models.TextChoices):
         CPU = 'cpu', 'Процесор'
         MOTHERBOARD = 'motherboard', 'Материнська плата'
@@ -48,8 +45,6 @@ class Brand(models.Model):
 
 
 class Product(models.Model):
-    """Одна комплектуюча, яку можна купити окремо або додати у збірку."""
-
     class Socket(models.TextChoices):
         AM4 = 'AM4', 'AM4'
         AM5 = 'AM5', 'AM5'
@@ -77,7 +72,6 @@ class Product(models.Model):
     is_active = models.BooleanField('Показувати на сайті', default=True)
     created_at = models.DateTimeField('Додано', auto_now_add=True)
 
-    # Характеристики для перевірки сумісності (заповнюються не для всіх категорій)
     socket = models.CharField('Сокет', max_length=10, choices=Socket.choices, blank=True,
                               help_text='Для процесорів і материнських плат')
     memory_type = models.CharField('Тип пам\'яті', max_length=10, choices=MemoryType.choices, blank=True,
@@ -90,7 +84,6 @@ class Product(models.Model):
     integrated_graphics = models.BooleanField('Вбудована графіка', default=False,
                                               help_text='Для процесорів: чи можна обійтись без відеокарти')
 
-    # Інші характеристики просто для показу: кожен рядок у форматі «Назва: значення»
     specs = models.TextField('Інші характеристики', blank=True,
                              help_text='Кожна характеристика з нового рядка, наприклад «Ядер: 6»')
 
@@ -112,7 +105,6 @@ class Product(models.Model):
 
     @property
     def image_url(self):
-        """Фото товару, а якщо його не завантажили — картинка-заглушка категорії."""
         if self.image:
             return self.image.url
         return static(f'img/categories/{self.category.kind}.svg')
@@ -128,7 +120,6 @@ class Product(models.Model):
         return 0
 
     def spec_list(self):
-        """Повертає всі характеристики списком пар (назва, значення) для таблиці на сторінці товару."""
         result = [('Бренд', self.brand.name)]
         if self.socket:
             result.append(('Сокет', self.socket))
@@ -187,10 +178,8 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name='Замовлення')
-    # SET_NULL: якщо товар колись видалять, рядок замовлення залишиться в історії
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, related_name='order_items',
                                 verbose_name='Товар')
-    # Назву і ціну копіюємо: якщо ціна товару зміниться, у старому замовленні залишиться ціна покупки
     name = models.CharField('Назва', max_length=255)
     price = models.DecimalField('Ціна за шт.', max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField('Кількість', default=1)

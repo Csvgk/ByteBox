@@ -14,6 +14,5 @@ urlpatterns = [
     path('', include('shop.urls')),
 ]
 
-# У режимі розробки Django сам віддає файли, завантажені користувачами
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
